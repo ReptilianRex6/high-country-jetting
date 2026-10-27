@@ -1,0 +1,117 @@
+/* Theme overrides. The default (no data-theme) is "Basin Hunter" and lives in site.css. */
+
+.theme-switcher {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #111;
+    color: #fff;
+    font: 600 .75rem/1 Arial, Helvetica, sans-serif
+}
+
+.theme-switcher span {
+    opacity: .7;
+    margin-right: 4px
+}
+
+.theme-switcher button {
+    border: 1px solid #777;
+    background: transparent;
+    color: #fff;
+    padding: 7px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: .75rem
+}
+
+.theme-switcher button[aria-pressed="true"] {
+    background: #fff;
+    color: #111;
+    border-color: #fff
+}
+
+/* Country Western: parchment, saddle brown, brick red, slab-serif headings. */
+html[data-theme="western"] {
+    --paper: #f4e8d0;
+    --ink: #3a2417;
+    --muted: #6a5240;
+    --accent: #a63d1f;
+    --accent-dark: #832e16;
+    --line: #d9c4a0;
+    --sand: #e0b04c;
+    --tint: #ecdcbc;
+    --tint-warm: #f0dfbf;
+    --banner: #e6d3ad;
+    --banner-text: #5a4430;
+    --footer: #ebdcbe;
+    --on-ink-soft: #e8d8bb;
+    --art-far: #7b5a3a;
+    --art-near: #55392a;
+    --art-peak: #e8d3a2;
+    --art-road: #d9a441;
+    --art-radius: 6px;
+    --serif: Rockwell, "Roboto Slab", Georgia, serif;
+    --sans: "Trebuchet MS", Verdana, sans-serif;
+    --heading-font: Rockwell, "Rockwell Extra Bold", "Roboto Slab", Georgia, serif
+}
+
+html[data-theme="western"] h1,
+html[data-theme="western"] h2,
+html[data-theme="western"] h3 {
+    letter-spacing: -.02em;
+    text-transform: none
+}
+
+html[data-theme="western"] h1 {
+    font-size: clamp(3rem, 5.4vw, 5.2rem)
+}
+
+html[data-theme="western"] .button,
+html[data-theme="western"] .card,
+html[data-theme="western"] .inquiry,
+html[data-theme="western"] .empty {
+    border-radius: 4px
+}
+
+html[data-theme="western"] .hero-art {
+    border: 4px double var(--sand)
+}
+
+/* Lake Powell: red-rock sand with deep lake blue. */
+html[data-theme="lake"] {
+    --paper: #fbf3e8;
+    --ink: #12384f;
+    --muted: #4c6372;
+    --accent: #bd4d28;
+    --accent-dark: #9a3d1f;
+    --line: #d9dfe0;
+    --sand: #f2b886;
+    --tint: #e0edf2;
+    --tint-warm: #f7e8d8;
+    --banner: #f1e2cf;
+    --banner-text: #4a5b66;
+    --footer: #eef3f4;
+    --on-ink-soft: #cfe3ec;
+    --art-far: #c4603c;
+    --art-near: #9a4128;
+    --art-peak: #ecbd90;
+    --art-road: #4db6dc;
+    --art-radius: 999px 999px 18px 18px;
+    --serif: Georgia, serif;
+    --sans: "Trebuchet MS", "Segoe UI", sans-serif;
+    --heading-font: "Trebuchet MS", "Segoe UI", sans-serif
+}
+
+html[data-theme="lake"] .hero-art {
+    background: linear-gradient(180deg, #1d5f86 0%, var(--ink) 100%)
+}
+
+html[data-theme="lake"] .button {
+    border-radius: 999px
+}

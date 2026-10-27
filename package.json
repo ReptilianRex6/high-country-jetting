@@ -1,0 +1,1 @@
+{"name":"high-country-jetting","private":true,"type":"module","scripts":{"build":"node scripts/build.mjs","check":"node scripts/check.mjs","dev":"node scripts/serve.mjs"}}
