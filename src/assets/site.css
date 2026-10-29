@@ -713,8 +713,7 @@ footer {
     }
 
     .hero-art {
-        aspect-ratio: 1/1.3;
-        padding-top: 50px
+        display: none
     }
 
     .art-label {
