@@ -52,4 +52,11 @@ export const other = [
   ],
 ];
 // Approved real client photos only: {src, alt, caption, width, height}.
-export const work = [];
+export const work = [
+  { slug: 'jetting-equipment', alt: 'High Country Jetting trailer and hoses at an outdoor job site', caption: 'Jetting equipment on site', width: 1280, height: 1707 },
+  { slug: 'indoor-drain-work', alt: 'Technician feeding a green hose into an indoor drain access', caption: 'Indoor drain service', width: 1280, height: 1707 },
+  { slug: 'drain-inspection', alt: 'Technician working beside drain inspection equipment indoors', caption: 'A closer look at the line', width: 1280, height: 1707 },
+  { slug: 'gutter-cleaning', alt: 'Open roof gutter with debris and cleaning equipment', caption: 'Gutter cleaning in progress', width: 1280, height: 1707 },
+  { slug: 'gutter-detail', alt: 'Close view beneath a gutter guard during maintenance', caption: 'Gutter maintenance up close', width: 1280, height: 1707 },
+  { slug: 'jetting-trailer', alt: 'High Country Jetting equipment trailer parked inside a workshop', caption: 'Equipment ready for the next job', width: 1125, height: 2000 },
+];
