@@ -1,5 +1,20 @@
 # High Country Jetting
 
+## Firebase review hosting
+
+Project: `high-country-jetting` (selected in `.firebaserc`). Review channel: `client-review`.
+Preview: https://high-country-jetting--client-review-a2lzch5c.web.app
+
+The review channel expires November 29, 2026 unless renewed. It is publicly accessible by URL, with preview noindex rules. The existing custom domain has not been changed.
+
+Refresh the review deployment after building and checking in preview mode, with `BASE_PATH` unset:
+
+```sh
+firebase hosting:channel:deploy client-review --project high-country-jetting --expires 30d
+```
+
+Firebase Auth is not used by this static site; a preview-channel Auth synchronization warning does not require enabling sign-in.
+
 Static multi-page redesign.
 
 ## Local preview
