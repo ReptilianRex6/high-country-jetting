@@ -3,7 +3,7 @@
 ## Branch workflow
 
 - Work on `staging`. Pushes run `.github/workflows/firebase-staging.yml` and update Firebase's `client-review` channel, renewing it for 30 days after each successful deployment.
-- GitHub uses Workload Identity Federation (no stored service-account key), restricted to this repository's staging branch. Initial cloud IAM setup must be completed before the workflow can authenticate.
+- GitHub uses Workload Identity Federation and a short-lived access token (no stored service-account key), restricted to this repository's staging branch. The cloud IAM setup is configured.
 - Merge approved staging changes into `main` at launch. The main workflow currently checks the production build only; live deployment is deliberately disabled. Enable a separately authorized main-branch identity/deploy step at launch. Merging today will not publish to Firebase live.
 - The older GitHub Pages preview remains available; Firebase is the review target going forward.
 - Drain/sewer and property services share `/services/`, with separate sections. `/other-services/` forwards to the property section.

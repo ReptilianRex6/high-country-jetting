@@ -28,8 +28,12 @@ jobs:
       - run: npm run build
       - run: npm run check
       - uses: google-github-actions/auth@v2
+        id: firebase-auth
         with:
+          token_format: access_token
           workload_identity_provider: projects/796827806809/locations/global/workloadIdentityPools/github-staging/providers/github
           service_account: github-staging@high-country-jetting.iam.gserviceaccount.com
       - name: Update client review channel
+        env:
+          FIREBASE_TOKEN: ${{ steps.firebase-auth.outputs.access_token }}
         run: npx --yes --package firebase-tools@14 firebase hosting:channel:deploy client-review --project high-country-jetting --expires 30d --non-interactive
