@@ -25,6 +25,15 @@
     background: var(--paper)
 }
 
+.service-categories { display: flex; gap: 28px; align-items: center; flex-wrap: wrap; padding-block: 28px; }
+.category-heading { padding-top: 38px; }
+.category-heading h2 { scroll-margin-top: 28px; }
+.service-row h3 { font-size: 2rem; margin-bottom: 16px; }
+.property-services { background: var(--tint); padding-bottom: 65px; }
+.property-services .other-grid { padding-top: 24px; }
+.property-services h3 { font-size: 2rem; }
+@media(max-width:600px) { .service-row h3, .property-services h3 { font-size: 1.65rem; } }
+
 /* Client branding and photography. Palette variables above remain unchanged. */
 .header .brand-logo { display: block; width: 172px; height: auto; }
 .hero-photo { margin: 0; position: relative; overflow: hidden; border-radius: 150px 150px 18px 18px; background: var(--ink); aspect-ratio: 1 / 1.16; }

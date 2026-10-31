@@ -13,8 +13,7 @@ const esc = (s) =>
 const call = `<a class="button" href="tel:${b.tel}">Call ${b.phone} ↗</a>`;
 const links = [
   ["/", "Home"],
-  ["/services/", "Drain & sewer"],
-  ["/other-services/", "Other services"],
+  ["/services/", "Services"],
   ["/recent-work/", "Recent work"],
   ["/contact/", "Contact"],
 ];
@@ -47,27 +46,10 @@ const pages = [
   ],
   [
     "/services/",
-    "Drain & Sewer Services",
-    "Hydro-jetting, drain cleaning, descaling, camera inspections, and locating in the Uintah Basin.",
-    intro(
-      "Drain & sewer services",
-      "Clear the blockage.<br>Understand the cause.",
-      "Practical cleaning and inspection options for the lines you rely on every day.",
-    ) +
-      `<section class="wrap service-list">${services.map((s, i) => `<article class="service-row" id="${s[0]}"><span class="number">0${i + 1}</span><div><h2>${s[1]}</h2><p>${s[2]}</p></div><div><p>${s[3]}</p><a class="text-link" href="/contact/">Ask about ${s[1].toLowerCase()} ↗</a></div></article>`).join("")}</section>` +
-      band,
-  ],
-  [
-    "/other-services/",
-    "Property Maintenance Services",
-    "Ask about gutter cleaning, chimney sweeping, and power washing in Uintah and Duchesne counties.",
-    intro(
-      "Around your property",
-      "Care beyond<br>the sewer line.",
-      "Gutter cleaning, chimney sweeping, and power washing for your property’s next project.",
-    ) +
-      `<section class="wrap section other-grid">${other.map((s, i) => `<article><span class="number">0${i + 1}</span><h2>${s[0]}</h2><p>${s[1]}</p><a class="text-link" href="/contact/">Discuss your project ↗</a></article>`).join("")}</section>` +
-      band,
+    "Drain, Sewer & Property Services",
+    "Explore drain cleaning, hydro-jetting, camera inspections, gutter cleaning, chimney sweeping, and power washing in the Uintah Basin.",
+    intro("Our services", "One local crew.<br>Plenty of ways to help.", "Explore our drain and sewer services, plus cleaning and maintenance around your property.") +
+    `<nav class="wrap service-categories" aria-label="Service categories"><a class="button" href="#drain-sewer">Drain & sewer ↓</a><a class="text-link" href="#property-services">Property services ↓</a></nav><section class="wrap service-list" aria-labelledby="drain-sewer"><div class="category-heading"><p class="eyebrow">01 · Drain & sewer</p><h2 id="drain-sewer">Clear lines. Clear answers.</h2></div>${services.map((s,i)=>`<article class="service-row" id="${s[0]}"><span class="number">0${i+1}</span><div><h3>${s[1]}</h3><p>${s[2]}</p></div><div><p>${s[3]}</p><a class="text-link" href="/contact/">Ask about ${s[1].toLowerCase()} ↗</a></div></article>`).join("")}</section><section class="property-services" aria-labelledby="property-services"><div class="wrap category-heading"><p class="eyebrow">02 · Around your property</p><h2 id="property-services">Care beyond the sewer line.</h2><p>Gutter cleaning, chimney sweeping, and power washing for your next project.</p></div><div class="wrap other-grid">${other.map((s,i)=>`<article><span class="number">0${i+1}</span><h3>${s[0]}</h3><p>${s[1]}</p><a class="text-link" href="/contact/">Discuss your project ↗</a></article>`).join("")}</div></section>` + band,
   ],
   [
     "/recent-work/",
@@ -141,6 +123,8 @@ for (const [path, title, description, body] of pages) {
     base ? html.replace(/(href|src)="\//g, `$1="${base}/`) : html,
   );
 }
+await mkdir("dist/other-services", {recursive:true});
+await writeFile("dist/other-services/index.html", `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0;url=${base}/services/#property-services"><title>Services moved | High Country Jetting</title><meta name="description" content="Property services are now on our combined services page."><link rel="canonical" href="${b.domain}/services/"><script type="application/ld+json">{}</script></head><body><main id="main"><h1>Our services are together now.</h1><a href="${base}/services/#property-services">See property services</a></main></body></html>`);
 await writeFile(
   "dist/robots.txt",
   preview

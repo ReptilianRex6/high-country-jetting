@@ -1,0 +1,35 @@
+name: Firebase staging preview
+
+on:
+  push:
+    branches: [staging]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: firebase-client-review
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    if: github.ref == 'refs/heads/staging'
+    runs-on: ubuntu-latest
+    env:
+      SITE_ENV: preview
+      BASE_PATH: ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm run build
+      - run: npm run check
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/796827806809/locations/global/workloadIdentityPools/github-staging/providers/github
+          service_account: github-staging@high-country-jetting.iam.gserviceaccount.com
+      - name: Update client review channel
+        run: npx --yes --package firebase-tools@14 firebase hosting:channel:deploy client-review --project high-country-jetting --expires 30d --non-interactive
