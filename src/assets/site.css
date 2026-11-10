@@ -25,14 +25,19 @@
     background: var(--paper)
 }
 
-.service-categories { display: flex; gap: 28px; align-items: center; flex-wrap: wrap; padding-block: 28px; }
 .category-heading { padding-top: 38px; }
 .category-heading h2 { scroll-margin-top: 28px; }
-.service-row h3 { font-size: 2rem; margin-bottom: 16px; }
+.service-heading { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 12px 24px; }
+.service-heading h2 { font-size: clamp(2.4rem, 4vw, 3.8rem); margin-bottom: 0; }
+.service-row h3, .property-services h3 { font-size: 1.65rem; }
+.service-row h3 { margin-bottom: 16px; }
+.service-row h3::before, .property-services h3::before { content: ""; display: inline-block; width: .45em; height: .45em; margin-right: .55em; border-radius: 50%; background: var(--accent); vertical-align: .12em; }
 .property-services { background: var(--tint); padding-bottom: 65px; }
+.property-services .category-heading h2 { font-size: clamp(2.4rem, 4vw, 3.8rem); margin-bottom: 12px; }
+.property-tagline { color: var(--muted); font-style: italic; margin-bottom: 0; }
 .property-services .other-grid { padding-top: 24px; }
-.property-services h3 { font-size: 2rem; }
-@media(max-width:600px) { .service-row h3, .property-services h3 { font-size: 1.65rem; } }
+.section-contact { padding-top: 30px; }
+@media(max-width:600px) { .service-row h3, .property-services h3 { font-size: 1.4rem; } }
 
 /* Client branding and photography. Palette variables above remain unchanged. */
 .header .brand-logo { display: block; width: 172px; height: auto; }
