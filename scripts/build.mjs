@@ -33,9 +33,7 @@ const home = `<section class="wrap hero"><div><p class="eyebrow">● &nbsp; Serv
   .join(
     "",
   )}</div></section><section class="area"><div class="wrap area-grid"><p class="eyebrow">Right here in the Basin</p><h2>Serving our<br>corner of Utah.</h2><div><p class="lead">Uintah County.<br>Duchesne County.</p><p>Have a job outside the regular service area? Call with your location and we’ll discuss availability.</p><a class="text-link" href="/contact/">Get in touch ↗</a></div></div></section>${band}`;
-const gallery = work.length
-  ? `<div class="gallery">${work.map((w) => `<figure><a href="/assets/work/${w.slug}-1280.webp" aria-label="View larger photo: ${esc(w.caption)}">${photo(w)}</a><figcaption>${esc(w.caption)}</figcaption></figure>`).join("")}</div>`
-  : "";
+const gallery = `<div class="gallery" id="gallery">${work.map((w) => `<figure><a href="/assets/work/${w.slug}-1280.webp" aria-label="View larger photo: ${esc(w.caption)}">${photo(w)}</a><figcaption>${esc(w.caption)}</figcaption></figure>`).join("")}</div>`;
 
 const pages = [
   [
@@ -67,6 +65,7 @@ const pages = [
     ) +
       `<section class="wrap section">${gallery}${preview ? '<aside class="note"><strong>Preview content pending:</strong> The recent Instagram posts feed will be added when the account is available.</aside>' : ""}</section>` +
       band,
+    '<script type="module" src="/assets/gallery.js"></script>',
   ],
   [
     "/contact/",
@@ -78,6 +77,18 @@ const pages = [
       "Call, text, or email with your location and a brief description of the problem.",
     ) +
       `<section class="wrap contact-grid"><div><p class="eyebrow">Start a conversation</p><a class="big-phone" href="tel:${b.tel}">${b.phone}</a><a class="text-link" href="sms:${b.tel}">Send a text ↗</a><a class="email" href="mailto:${b.email}">${b.email}</a><h2 class="small-title">Service area</h2><p>Uintah County and Duchesne County, Utah.</p><p>Outside these areas? Contact us to ask about availability.</p></div><aside class="inquiry"><p class="eyebrow">Help us help you</p><h2>A few details<br>go a long way.</h2><ol><li>Your name and callback number</li><li>The town or location of the job</li><li>What’s happening, and when it started</li><li>A convenient time to get in touch</li></ol><p>Please call for urgent issues. Email response times can vary.</p></aside></section>`,
+  ],
+  [
+    "/admin/",
+    "Website Photos",
+    "Add and remove photos on the High Country Jetting Recent Work page.",
+    intro(
+      "Website photos",
+      "Add a photo<br>from the job.",
+      "Snap a photo, add a few words, and post it to the Recent Work page.",
+    ) +
+      `<section class="wrap admin"><div class="admin-bar"><p id="admin-status" role="status">Loading…</p><button id="signin" class="button" type="button" hidden>Sign in with Google</button><button id="signout" class="admin-link" type="button" hidden>Sign out</button></div><div id="admin-panel" hidden><form id="upload-form" class="admin-card" novalidate><h2>Add a photo</h2><label class="photo-pick"><input id="photo" type="file" accept="image/*"><span>📷 Take or choose a photo</span></label><img id="preview" class="admin-preview" alt="Selected photo preview" hidden><label>Type of work<select id="category"><option value="drain-sewer">Drain &amp; sewer</option><option value="property">Property services</option></select></label><label>Short caption <span class="hint">a few words</span><input id="caption" maxlength="80" autocomplete="off" placeholder="Hydro-jetting a main line"></label><label>Description <span class="hint">optional</span><textarea id="description" maxlength="500" rows="3" placeholder="Jot a few notes and tap ✨ to polish them, or leave it blank."></textarea></label><input type="hidden" id="alt"><div class="admin-actions"><button id="suggest" class="button button-soft" type="button">✨ Write it for me</button><button id="upload" class="button" type="submit">Post to website</button></div><p id="form-msg" class="admin-msg" role="status"></p></form><section class="admin-card"><h2>On the website now</h2><ul id="photo-list" class="photo-list"></ul></section></div></section>`,
+    '<script type="module" src="/assets/admin.js"></script>',
   ],
   [
     "/404.html",
@@ -97,7 +108,7 @@ await cp("src/assets", "dist/assets", {
   recursive: true,
   filter: (source) => !/\.(?:pdf|jpe?g)$/i.test(source),
 });
-for (const [path, title, description, body] of pages) {
+for (const [path, title, description, body, scripts = ""] of pages) {
   const nav = links
     .map(
       ([url, label]) =>
@@ -113,7 +124,7 @@ for (const [path, title, description, body] of pages) {
     email: b.email,
     areaServed: ["Uintah County, Utah", "Duchesne County, Utah"],
   }).replace(/</g, "\\u003c");
-  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)} | ${b.name}</title><meta name="description" content="${esc(description)}">${preview || path === "/404.html" ? '<meta name="robots" content="noindex, nofollow">' : ""}<link rel="canonical" href="${b.domain}${path}"><meta name="theme-color" content="#12384f"><meta property="og:title" content="${esc(title)} | ${b.name}"><meta property="og:description" content="${esc(description)}"><meta property="og:type" content="website"><meta property="og:url" content="${b.domain}${path}"><link rel="icon" href="/assets/favicon.svg"><link rel="stylesheet" href="/assets/site.css"><script defer src="/assets/site.js"></script><script type="application/ld+json">${schema}</script></head><body><a class="skip" href="#main">Skip to content</a>${preview ? '<div class="preview-banner">Design preview · Business details and integrations pending client review</div>' : ""}<header class="wrap header"><a class="brand" href="/" aria-label="High Country Jetting home"><img class="brand-logo" src="/assets/logo.png" alt="High Country Jetting" width="1618" height="961"></a><button class="menu" aria-expanded="false" aria-controls="nav" type="button">Menu ＋</button><nav id="nav" aria-label="Main navigation">${nav}</nav><a class="header-call" href="tel:${b.tel}">Call now ↗</a></header><main id="main">${body}</main><footer><div class="wrap footer-grid"><div><a class="footer-brand" href="/">High Country Jetting</a><p>Drain & sewer services.<br>Rooted in the Uintah Basin.</p></div><div><p class="eyebrow">Explore</p>${links
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)} | ${b.name}</title><meta name="description" content="${esc(description)}">${preview || path === "/404.html" || path === "/admin/" ? '<meta name="robots" content="noindex, nofollow">' : ""}<link rel="canonical" href="${b.domain}${path}"><meta name="theme-color" content="#12384f"><meta property="og:title" content="${esc(title)} | ${b.name}"><meta property="og:description" content="${esc(description)}"><meta property="og:type" content="website"><meta property="og:url" content="${b.domain}${path}"><link rel="icon" href="/assets/favicon.svg"><link rel="stylesheet" href="/assets/site.css"><script defer src="/assets/site.js"></script><script type="application/ld+json">${schema}</script>${scripts}</head><body><a class="skip" href="#main">Skip to content</a>${preview ? '<div class="preview-banner">Design preview · Business details and integrations pending client review</div>' : ""}<header class="wrap header"><a class="brand" href="/" aria-label="High Country Jetting home"><img class="brand-logo" src="/assets/logo.png" alt="High Country Jetting" width="1618" height="961"></a><button class="menu" aria-expanded="false" aria-controls="nav" type="button">Menu ＋</button><nav id="nav" aria-label="Main navigation">${nav}</nav><a class="header-call" href="tel:${b.tel}">Call now ↗</a></header><main id="main">${body}</main><footer><div class="wrap footer-grid"><div><a class="footer-brand" href="/">High Country Jetting</a><p>Drain & sewer services.<br>Rooted in the Uintah Basin.</p></div><div><p class="eyebrow">Explore</p>${links
     .slice(1)
     .map(([url, label]) => `<a href="${url}">${label}</a>`)
     .join(
@@ -137,12 +148,12 @@ await writeFile(
   "dist/robots.txt",
   preview
     ? "User-agent: *\nDisallow: /\n"
-    : `User-agent: *\nAllow: /\nSitemap: ${b.domain}/sitemap.xml\n`,
+    : `User-agent: *\nAllow: /\nDisallow: /admin/\nSitemap: ${b.domain}/sitemap.xml\n`,
 );
 await writeFile(
   "dist/sitemap.xml",
   `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${pages
-    .filter((p) => p[0] != "/404.html")
+    .filter((p) => !["/404.html", "/admin/"].includes(p[0]))
     .map((p) => `<url><loc>${b.domain}${p[0]}</loc></url>`)
     .join("")}</urlset>`,
 );

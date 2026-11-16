@@ -55,3 +55,14 @@ Production permits indexing and removes preview notices. Do not launch until con
 ## Photo workflow to set up
 
 Use a client-owned Website Photos Drive folder and test uploads from the client's phone. Include service, town, caption, and publication permission. Review submissions, remove sensitive details/location metadata, optimize into `src/assets/work/`, and add approved entries to `work` in `src/content.mjs` with `slug`, `alt`, `caption`, `width`, and `height`; produce matching `<slug>-640.webp` and `<slug>-1280.webp` variants. Build, check, and deploy after review. Drive submissions do not automatically publish. Confirm future publishing responsibility and maintenance pricing at handoff.
+
+## Photo manager (`/admin/`)
+
+The client posts job photos from his phone at `/admin/`. He signs in with Google, picks a photo and a category, adds a caption, and optionally taps **✨ Write it for me**. The photo is resized in the browser to 1280px and 640px WebP (JPEG on older Safari). Re-encoding drops EXIF/GPS data. The files go to Cloud Storage `work/`, the entry goes to Firestore `photos`, and `/recent-work/` loads those entries in front of the built-in photos.
+
+- Who can post: the email lists in `firestore.rules` and `storage.rules`. Keep both lists in sync.
+- Rules deploy separately from hosting: `firebase deploy --only firestore:rules,storage`
+- Firebase config comes from Hosting's `/__/firebase/init.json`, so the live gallery and admin only work on Firebase Hosting, not on `npm run dev`.
+- AI captions use Firebase AI Logic (Gemini Developer API), model set in `src/assets/admin.js`.
+
+One-time console setup: Blaze plan with a budget alert, Authentication → Google provider, Firestore database, Storage bucket, AI Logic, and App Check (recommended so the AI endpoint isn't open to abuse).

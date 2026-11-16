@@ -1,0 +1,22 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Keep in sync with firestore.rules.
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in [
+          'highcountryjetting@gmail.com'
+          // , 'your-dev-email@gmail.com'
+        ];
+    }
+
+    match /work/{file} {
+      allow read: if true;
+      allow create: if isAdmin()
+        && request.resource.size < 3 * 1024 * 1024
+        && request.resource.contentType in ['image/webp', 'image/jpeg'];
+      allow delete: if isAdmin();
+    }
+  }
+}
