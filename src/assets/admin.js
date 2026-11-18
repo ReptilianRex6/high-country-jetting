@@ -18,16 +18,26 @@ const ui = {
   caption: $("caption"), description: $("description"), alt: $("alt"),
   suggest: $("suggest"), submit: $("upload"), msg: $("form-msg"), list: $("photo-list"),
 };
-const say = (node, text, tone = "") => { node.textContent = text; node.dataset.tone = tone; };
+const say = (node, text, tone = "") => {
+  node.textContent = text;
+  node.dataset.tone = tone;
+  node.setAttribute("role", tone === "error" ? "alert" : "status");
+};
 
 function friendly(err) {
   const code = err?.code || "";
+  // auth/unauthorized-domain also contains "unauthorized", so this check has to come first.
+  if (code.includes("unauthorized-domain"))
+    return `Sign-in failed. This address (${location.hostname}) is not approved for Firebase sign-in. Add it under Firebase Console → Authentication → Settings → Authorized domains.`;
+  if (code.includes("operation-not-allowed"))
+    return "Sign-in failed. Google sign-in is turned off for this project. Enable it under Firebase Console → Authentication → Sign-in method.";
+  if (code.includes("popup-blocked"))
+    return "Sign-in failed. The browser blocked the sign-in window. Allow pop-ups for this site and try again.";
+  if (code.includes("popup-closed") || code.includes("cancelled-popup")) return "Sign-in was cancelled.";
   if (code.includes("permission-denied") || code.includes("unauthorized"))
     return "This Google account isn't allowed to change the website photos.";
-  if (code.includes("popup-closed") || code.includes("cancelled-popup")) return "Sign-in was cancelled.";
-  if (code.includes("unauthorized-domain")) return "This web address isn't approved for sign-in yet. Ask Ethan to add it.";
   if (code.includes("network") || code.includes("unavailable")) return "Couldn't reach the internet. Check your signal and try again.";
-  return "Something went wrong. Please try again.";
+  return code ? `Something went wrong (${code}). Please try again.` : "Something went wrong. Please try again.";
 }
 
 let app, auth, db, storage, fs, st;
@@ -39,8 +49,20 @@ try {
   db = fs.getFirestore(app);
   storage = st.getStorage(app);
 
-  ui.signin.onclick = () =>
-    authSdk.signInWithPopup(auth, new authSdk.GoogleAuthProvider()).catch((e) => say(ui.status, friendly(e), "error"));
+  ui.signin.onclick = () => {
+    let pending;
+    try {
+      pending = authSdk.signInWithPopup(auth, new authSdk.GoogleAuthProvider());
+    } catch (err) {
+      console.error(err);
+      say(ui.status, friendly(err), "error");
+      return;
+    }
+    pending.catch((err) => {
+      console.error(err);
+      say(ui.status, friendly(err), "error");
+    });
+  };
   ui.signout.onclick = () => authSdk.signOut(auth);
   authSdk.onAuthStateChanged(auth, onUser);
 } catch (err) {

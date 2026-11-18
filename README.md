@@ -21,7 +21,7 @@ Refresh the review deployment after building and checking in preview mode, with 
 firebase hosting:channel:deploy client-review --project high-country-jetting --expires 30d
 ```
 
-Firebase Auth is not used by this static site; a preview-channel Auth synchronization warning does not require enabling sign-in.
+`/admin/` signs in with Firebase Auth. Channel deploys warn `Unable to add channel domain to Firebase Auth` because the staging deploy account cannot edit Auth settings. Sign-in on the preview fails until that host is listed under Authentication → Settings → Authorized domains. For this channel, add `high-country-jetting--client-review-a2lzch5c.web.app`. Also enable Google under Authentication → Sign-in method.
 
 Static multi-page redesign.
 
@@ -65,4 +65,4 @@ The client posts job photos from his phone at `/admin/`. He signs in with Google
 - Firebase config comes from Hosting's `/__/firebase/init.json`, so the live gallery and admin only work on Firebase Hosting, not on `npm run dev`.
 - AI captions use Firebase AI Logic (Gemini Developer API), model set in `src/assets/admin.js`.
 
-One-time console setup: Blaze plan with a budget alert, Authentication → Google provider, Firestore database, Storage bucket, AI Logic, and App Check (recommended so the AI endpoint isn't open to abuse).
+One-time console setup: Blaze plan with a budget alert, Authentication → Sign-in method → Google, Authentication → Settings → Authorized domains (include the preview host above), Firestore database, Storage bucket, AI Logic, and App Check (recommended so the AI endpoint isn't open to abuse).
