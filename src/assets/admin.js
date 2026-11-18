@@ -2,7 +2,8 @@
 // storage.rules can post or remove photos; everyone else is read-only.
 import { getApp, sdk } from "./fb.js";
 
-const MODEL = "gemini-3.6-flash";
+// Agent Platform Gemini API (formerly Vertex AI), location `global`. Billed on Blaze, not AI Studio.
+const MODEL = "gemini-3.8-flash";
 const CATEGORIES = { "drain-sewer": "Drain & sewer", property: "Property services" };
 const PROMPT = `You write gallery text for High Country Jetting, a local drain, sewer, and property-services company in Utah's Uintah Basin.
 Return JSON with:
@@ -143,8 +144,8 @@ ui.suggest.onclick = async () => {
   ui.suggest.disabled = true;
   say(ui.msg, "Writing a caption…");
   try {
-    const { getAI, getGenerativeModel, GoogleAIBackend, Schema } = await sdk("ai");
-    const model = getGenerativeModel(getAI(app, { backend: new GoogleAIBackend() }), {
+    const { getAI, getGenerativeModel, AgentPlatformBackend, Schema } = await sdk("ai");
+    const model = getGenerativeModel(getAI(app, { backend: new AgentPlatformBackend("global") }), {
       model: MODEL,
       systemInstruction: PROMPT,
       generationConfig: {
