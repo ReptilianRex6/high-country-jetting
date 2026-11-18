@@ -1,5 +1,16 @@
 import { mkdir, writeFile, cp, rm } from "node:fs/promises";
-import { business as b, services, other, work } from "../src/content.mjs";
+import {
+  business as b,
+  services,
+  other,
+  work,
+  towns,
+  faqs,
+  profiles,
+  address,
+  openingHours,
+  geo,
+} from "../src/content.mjs";
 const preview = process.env.SITE_ENV !== "production";
 const base = (process.env.BASE_PATH || "").replace(/\/$/, "");
 const esc = (s) =>
@@ -14,6 +25,7 @@ const call = `<a class="button" href="tel:${b.tel}">Call ${b.phone} ↗</a>`;
 const links = [
   ["/", "Home"],
   ["/services/", "Services"],
+  ["/service-area/", "Service area"],
   ["/recent-work/", "Recent work"],
   ["/contact/", "Contact"],
 ];
@@ -23,8 +35,171 @@ const band = `<section class="band"><div class="wrap band-inner"><div><p class="
 const photo = (w, { hero = false } = {}) =>
   `<img src="/assets/work/${w.slug}-1280.webp" srcset="${base}/assets/work/${w.slug}-640.webp 640w, ${base}/assets/work/${w.slug}-1280.webp ${w.width}w" sizes="${hero ? "(max-width: 600px) 100vw, 50vw" : "(max-width: 600px) 100vw, (max-width: 900px) 50vw, 33vw"}" alt="${esc(w.alt)}" width="${w.width}" height="${w.height}" ${hero ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
 const art = `<figure class="hero-photo">${photo(work[0], { hero: true })}<figcaption>Local equipment. Real work.<span>High Country Jetting · Uintah Basin</span></figcaption></figure>`;
+const ogImage = {
+  url: `${b.domain}/assets/og.png`,
+  width: 1200,
+  height: 630,
+  alt: "High Country Jetting logo, with a mountain mark above the business name",
+  type: "image/png",
+};
+const pageTowns = towns.filter((t) => t.page);
 
-const home = `<section class="wrap hero"><div><p class="eyebrow">● &nbsp; Serving the Uintah Basin</p><h1>Clear lines.<br>Local service.<br><em>Less hassle.</em></h1><p class="lead">Drain cleaning, hydro-jetting, and sewer camera inspections for Uintah and Duchesne counties.</p><div class="actions">${call}<a class="text-link" href="/services/">Explore our services ↗</a></div></div>${art}</section><div class="strip"><div class="wrap"><span>Hydro-jetting</span><span>Camera inspections</span><span>Pipe descaling</span><span>Line locating</span></div></div><section class="wrap section"><div class="section-heading"><div><p class="eyebrow">Below the surface</p><h2>A clear plan for<br>a clogged line.</h2></div><p>From a slow drain to a recurring sewer backup, the first step is understanding the problem. We offer cleaning and diagnostic services to help you decide what comes next.</p></div><div class="cards">${services
+function joinList(parts) {
+  if (parts.length <= 1) return parts.join("");
+  if (parts.length === 2) return `${parts[0]} and ${parts[1]}`;
+  return `${parts.slice(0, -1).join(", ")}, and ${parts.at(-1)}`;
+}
+function townName(town) {
+  return town.page
+    ? `<a href="/service-area/${town.slug}/">${esc(town.name)}</a>`
+    : esc(town.name);
+}
+function townListHtml() {
+  return `<ul class="town-list">${["Uintah", "Duchesne"]
+    .map((county) => {
+      const names = joinList(
+        towns.filter((t) => t.county === county).map(townName),
+      );
+      return `<li><strong>${county} County, Utah.</strong> ${names}.</li>`;
+    })
+    .join("")}</ul>`;
+}
+function faqHtml() {
+  return `<section class="wrap section faq" id="faq" aria-labelledby="faq-title"><div class="section-heading"><div><p class="eyebrow">Good questions</p><h2 id="faq-title">Before you call.</h2></div><p>Where we work, and how hydro-jetting compares with snaking.</p></div><div class="faq-list">${faqs
+    .map(
+      (item) =>
+        `<article><h3>${esc(item.q)}</h3><p>${esc(item.a)}</p></article>`,
+    )
+    .join("")}</div></section>`;
+}
+function businessSchema() {
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": ["PlumbingService", "LocalBusiness"],
+    "@id": `${b.domain}/#business`,
+    name: b.name,
+    url: b.domain,
+    telephone: b.tel,
+    email: b.email,
+    logo: `${b.domain}/assets/logo.png`,
+    image: [
+      `${b.domain}/assets/work/jetting-equipment-1280.webp`,
+      `${b.domain}/assets/logo.png`,
+    ],
+    description:
+      "Drain cleaning, hydro-jetting, camera inspections, pipe descaling, and line locating for Uintah and Duchesne counties in Utah’s Uintah Basin.",
+    areaServed: [
+      ...towns.map((t) => ({
+        "@type": "City",
+        name: t.name,
+        containedInPlace: {
+          "@type": "AdministrativeArea",
+          name: `${t.county} County`,
+          containedInPlace: { "@type": "State", name: "Utah" },
+        },
+      })),
+      ...["Uintah County", "Duchesne County"].map((name) => ({
+        "@type": "AdministrativeArea",
+        name,
+        containedInPlace: { "@type": "State", name: "Utah" },
+      })),
+    ],
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: "Drain, sewer, and property services",
+      itemListElement: [
+        ...services.map((s) => ({
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: s[1],
+            description: s[3],
+            url: `${b.domain}/services/#${s[0]}`,
+          },
+        })),
+        ...other.map((s) => ({
+          "@type": "Offer",
+          itemOffered: {
+            "@type": "Service",
+            name: s[0],
+            description: s[1],
+            url: `${b.domain}/services/#property-services`,
+          },
+        })),
+      ],
+    },
+  };
+  // sameAs, address, openingHours, and geo stay off until src/content.mjs has real values.
+  if (profiles.length) {
+    if (
+      profiles.some((url) => typeof url !== "string" || !/^https:\/\//.test(url))
+    ) {
+      throw new Error("profiles in src/content.mjs must be https URLs");
+    }
+    schema.sameAs = profiles;
+  }
+  if (address) schema.address = address;
+  if (openingHours) schema.openingHours = openingHours;
+  if (geo) schema.geo = geo;
+  return schema;
+}
+function faqSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((item) => ({
+      "@type": "Question",
+      name: item.q,
+      acceptedAnswer: { "@type": "Answer", text: item.a },
+    })),
+  };
+}
+function jsonLdScripts(path) {
+  const blocks = [businessSchema()];
+  if (path === "/service-area/") blocks.push(faqSchema());
+  return blocks
+    .map(
+      (block) =>
+        `<script type="application/ld+json">${JSON.stringify(block).replace(/</g, "\\u003c")}</script>`,
+    )
+    .join("");
+}
+function townPage(town) {
+  if (!town.lead || !town.blurb) throw new Error(`town ${town.slug} needs lead and blurb`);
+  const others = pageTowns.filter((t) => t.slug !== town.slug);
+  const serviceItems = services
+    .map(
+      (s) =>
+        `<li><a href="/services/#${s[0]}">${esc(s[1])}</a>. ${esc(s[2])}</li>`,
+    )
+    .join("");
+  return [
+    `/service-area/${town.slug}/`,
+    `Drain Cleaning in ${town.name}, Utah`,
+    `Drain cleaning, hydro-jetting, and sewer camera inspections in ${town.name}, Utah. High Country Jetting serves ${town.county} County and the rest of the Uintah Basin.`,
+    intro(
+      `${esc(town.name)}, Utah`,
+      `Drain cleaning<br>in ${esc(town.name)},<br><em>Utah.</em>`,
+      town.lead,
+    ) +
+      `<section class="wrap section town-services"><div class="section-heading"><div><p class="eyebrow">On this job</p><h2>Ways we can help<br>in ${esc(town.name)}.</h2></div><p>${esc(town.blurb)}</p></div><ul class="service-links">${serviceItems}</ul><p class="town-also">Also serving ${joinList(others.map(townName))}, plus other communities in <a href="/service-area/">Uintah and Duchesne counties</a>. Gutter cleaning, chimney sweeping, and power washing are on the <a href="/services/#property-services">property services</a> list.</p></section>${band}`,
+  ];
+}
+function serviceAreaPage() {
+  return [
+    "/service-area/",
+    "Service Area: Vernal, Roosevelt & Duchesne, Utah",
+    "High Country Jetting serves Vernal, Roosevelt, Duchesne, and other communities in Uintah and Duchesne counties, Utah.",
+    intro(
+      "Service area",
+      "Vernal, Roosevelt,<br>Duchesne & the<br><em>Uintah Basin.</em>",
+      "Drain cleaning, hydro-jetting, and sewer inspections across Uintah County and Duchesne County, Utah.",
+    ) +
+      `<section class="wrap section"><div class="section-heading"><div><p class="eyebrow">Where we work</p><h2>Two counties.<br>These communities.</h2></div><p>These towns are in the Uintah Basin counties we serve. Don’t see yours? Call with the location and we’ll discuss availability.</p></div>${townListHtml()}<p class="town-also"><a class="text-link" href="/contact/">Ask about a town ↗</a></p></section>${faqHtml()}${band}`,
+  ];
+}
+
+const home = `<section class="wrap hero"><div><p class="eyebrow">● &nbsp; Serving Utah’s Uintah Basin</p><h1><span class="places">Drain cleaning in Vernal, Roosevelt &amp; Duchesne</span>Clear lines.<br>Local service.<br><em>Less hassle.</em></h1><p class="lead">Hydro-jetting, drain cleaning, and sewer camera inspections for Vernal, Roosevelt, Duchesne, and the rest of Uintah and Duchesne counties.</p><div class="actions">${call}<a class="text-link" href="/services/">Explore our services ↗</a></div></div>${art}</section><div class="strip"><div class="wrap"><span>Hydro-jetting</span><span>Camera inspections</span><span>Pipe descaling</span><span>Line locating</span></div></div><section class="wrap section"><div class="section-heading"><div><p class="eyebrow">Below the surface</p><h2>A clear plan for<br>a clogged line.</h2></div><p>From a slow drain in Vernal to a recurring sewer backup in Roosevelt or Duchesne, the first step is understanding the problem. We offer cleaning and diagnostic services to help you decide what comes next.</p></div><div class="cards">${services
   .slice(0, 3)
   .map(
     (s, i) =>
@@ -32,36 +207,38 @@ const home = `<section class="wrap hero"><div><p class="eyebrow">● &nbsp; Serv
   )
   .join(
     "",
-  )}</div></section><section class="area"><div class="wrap area-grid"><p class="eyebrow">Right here in the Basin</p><h2>Serving our<br>corner of Utah.</h2><div><p class="lead">Uintah County.<br>Duchesne County.</p><p>Have a job outside the regular service area? Call with your location and we’ll discuss availability.</p><a class="text-link" href="/contact/">Get in touch ↗</a></div></div></section>${band}`;
+  )}</div></section><section class="area" id="service-area"><div class="wrap area-grid"><p class="eyebrow">Right here in the Basin</p><h2>Vernal,<br>Roosevelt<br>&amp; Duchesne.</h2><div><p class="lead">Homes and businesses in both counties.</p>${townListHtml()}<p>Have a job outside the regular service area? Call with your location and we’ll discuss availability.</p><a class="text-link" href="/service-area/">See towns we serve ↗</a></div></div></section>${band}`;
 const gallery = `<div class="gallery" id="gallery">${work.map((w) => `<figure><a href="/assets/work/${w.slug}-1280.webp" aria-label="View larger photo: ${esc(w.caption)}">${photo(w)}</a><figcaption>${esc(w.caption)}</figcaption></figure>`).join("")}</div>`;
 
 const pages = [
   [
     "/",
-    "Drain Cleaning & Hydro-Jetting in the Uintah Basin",
-    "Drain cleaning, hydro-jetting, and sewer inspections serving Uintah and Duchesne counties.",
+    "Drain Cleaning in Vernal, Roosevelt & Duchesne",
+    "Drain cleaning, hydro-jetting, and sewer camera inspections in Vernal, Roosevelt, Duchesne, and across Utah’s Uintah Basin.",
     home,
   ],
   [
     "/services/",
-    "Drain, Sewer & Property Services",
-    "Explore drain cleaning, hydro-jetting, camera inspections, gutter cleaning, chimney sweeping, and power washing in the Uintah Basin.",
+    "Drain & Sewer Services in Vernal, Roosevelt & Duchesne",
+    "Hydro-jetting, drain cleaning, camera inspections, and property care in Vernal, Roosevelt, Duchesne, and Utah’s Uintah Basin.",
     intro(
       "Our services",
-      "One local crew.<br>Plenty of ways to help.",
-      "Explore our drain and sewer services, plus cleaning and maintenance around your property.",
+      "One local crew<br>for Vernal,<br><em>Roosevelt &amp; Duchesne.</em>",
+      "Drain cleaning, hydro-jetting, camera inspections, and property care for homes and businesses in Utah’s Uintah Basin.",
     ) +
       `<section class="wrap service-list" aria-labelledby="drain-sewer"><div class="category-heading service-heading"><h2 id="drain-sewer">Drain &amp; sewer</h2><a class="text-link" href="#property-services">Jump to property services ↓</a></div>${services.map((s) => `<article class="service-row" id="${s[0]}"><div><h3>${s[1]}</h3><p>${s[2]}</p></div><div><p>${s[3]}</p></div></article>`).join("")}<div class="section-contact"><a class="text-link" href="/contact/">Ask about drain &amp; sewer services ↗</a></div></section><section class="property-services" aria-labelledby="property-services"><div class="wrap category-heading"><h2 id="property-services">Around your property</h2><p class="property-tagline">Care beyond the sewer line.</p></div><div class="wrap other-grid">${other.map((s) => `<article><h3>${s[0]}</h3><p>${s[1]}</p></article>`).join("")}</div><div class="wrap section-contact"><a class="text-link" href="/contact/">Ask about property services ↗</a></div></section>` +
       band,
   ],
+  serviceAreaPage(),
+  ...pageTowns.map(townPage),
   [
     "/recent-work/",
-    "Recent Work",
-    "Recent projects from High Country Jetting, serving the Uintah Basin.",
+    "Recent Work in Vernal, Roosevelt & Duchesne",
+    "Photos of drain, sewer, and property work by High Country Jetting in Vernal, Roosevelt, Duchesne, and nearby Uintah Basin towns.",
     intro(
       "Recent work",
-      "A look at<br>the work we do.",
-      "Drain and sewer service, property maintenance, and projects around the Uintah Basin.",
+      "Recent work<br>around Vernal,<br><em>Roosevelt &amp; Duchesne.</em>",
+      "Drain and sewer service, property maintenance, and projects across Uintah and Duchesne counties in Utah.",
     ) +
       `<section class="wrap section">${gallery}${preview ? '<aside class="note"><strong>Preview content pending:</strong> The recent Instagram posts feed will be added when the account is available.</aside>' : ""}</section>` +
       band,
@@ -69,14 +246,14 @@ const pages = [
   ],
   [
     "/contact/",
-    "Contact & Service Area",
-    `Call ${b.phone} for drain and sewer services in Uintah and Duchesne counties.`,
+    "Contact for Vernal, Roosevelt & Duchesne Drain Service",
+    `Call ${b.phone} for drain cleaning and hydro-jetting in Vernal, Roosevelt, Duchesne, and other Uintah Basin towns in Utah.`,
     intro(
       "Contact High Country Jetting",
-      "Let’s talk<br>about your line.",
-      "Call, text, or email with your location and a brief description of the problem.",
+      "Let’s talk.<br>Vernal, Roosevelt<br><em>&amp; Duchesne.</em>",
+      "Call, text, or email with your town and a brief description of the problem.",
     ) +
-      `<section class="wrap contact-grid"><div><p class="eyebrow">Start a conversation</p><a class="big-phone" href="tel:${b.tel}">${b.phone}</a><a class="text-link" href="sms:${b.tel}">Send a text ↗</a><a class="email" href="mailto:${b.email}">${b.email}</a><h2 class="small-title">Service area</h2><p>Uintah County and Duchesne County, Utah.</p><p>Outside these areas? Contact us to ask about availability.</p></div><aside class="inquiry"><p class="eyebrow">Help us help you</p><h2>A few details<br>go a long way.</h2><ol><li>Your name and callback number</li><li>The town or location of the job</li><li>What’s happening, and when it started</li><li>A convenient time to get in touch</li></ol><p>Please call for urgent issues. Email response times can vary.</p></aside></section>`,
+      `<section class="wrap contact-grid"><div><p class="eyebrow">Start a conversation</p><a class="big-phone" href="tel:${b.tel}">${b.phone}</a><a class="text-link" href="sms:${b.tel}">Send a text ↗</a><a class="email" href="mailto:${b.email}">${b.email}</a><h2 class="small-title">Service area</h2><p>Vernal, Roosevelt, and Duchesne, plus Naples, Ballard, Fort Duchesne, Myton, Altamont, and Tabiona.</p><p>Those communities are in Uintah County or Duchesne County, Utah. <a href="/service-area/">See the service area ↗</a></p><p>Outside these counties? Contact us to ask about availability.</p></div><aside class="inquiry"><p class="eyebrow">Help us help you</p><h2>A few details<br>go a long way.</h2><ol><li>Your name and callback number</li><li>The town or location of the job</li><li>What’s happening, and when it started</li><li>A convenient time to get in touch</li></ol><p>Please call for urgent issues. Email response times can vary.</p></aside></section>`,
   ],
   [
     "/admin/",
@@ -110,26 +287,23 @@ await cp("src/assets", "dist/assets", {
 });
 for (const [path, title, description, body, scripts = ""] of pages) {
   const nav = links
-    .map(
-      ([url, label]) =>
-        `<a href="${url}" ${url === path ? 'aria-current="page"' : ""}>${label}</a>`,
-    )
+    .map(([url, label]) => {
+      const on = url === "/" ? path === "/" : path.startsWith(url);
+      return `<a href="${url}"${on ? ' aria-current="page"' : ""}>${label}</a>`;
+    })
     .join("");
-  const schema = JSON.stringify({
-    "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    name: b.name,
-    url: b.domain,
-    telephone: b.tel,
-    email: b.email,
-    areaServed: ["Uintah County, Utah", "Duchesne County, Utah"],
-  }).replace(/</g, "\\u003c");
-  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)} | ${b.name}</title><meta name="description" content="${esc(description)}">${preview || path === "/404.html" || path === "/admin/" ? '<meta name="robots" content="noindex, nofollow">' : ""}<link rel="canonical" href="${b.domain}${path}"><meta name="theme-color" content="#12384f"><meta property="og:title" content="${esc(title)} | ${b.name}"><meta property="og:description" content="${esc(description)}"><meta property="og:type" content="website"><meta property="og:url" content="${b.domain}${path}"><link rel="icon" href="/assets/favicon.svg"><link rel="stylesheet" href="/assets/site.css"><script defer src="/assets/site.js"></script><script type="application/ld+json">${schema}</script>${scripts}</head><body><a class="skip" href="#main">Skip to content</a>${preview ? '<div class="preview-banner">Design preview · Business details and integrations pending client review</div>' : ""}<header class="wrap header"><a class="brand" href="/" aria-label="High Country Jetting home"><img class="brand-logo" src="/assets/logo.png" alt="High Country Jetting" width="1618" height="961"></a><button class="menu" aria-expanded="false" aria-controls="nav" type="button">Menu ＋</button><nav id="nav" aria-label="Main navigation">${nav}</nav><a class="header-call" href="tel:${b.tel}">Call now ↗</a></header><main id="main">${body}</main><footer><div class="wrap footer-grid"><div><a class="footer-brand" href="/">High Country Jetting</a><p>Drain & sewer services.<br>Rooted in the Uintah Basin.</p></div><div><p class="eyebrow">Explore</p>${links
+  const pageTitle = `${esc(title)} | ${b.name}`;
+  const descriptionTag = esc(description);
+  const robots =
+    preview || path === "/404.html" || path === "/admin/"
+      ? '<meta name="robots" content="noindex, nofollow">'
+      : "";
+  const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${pageTitle}</title><meta name="description" content="${descriptionTag}">${robots}<link rel="canonical" href="${b.domain}${path}"><meta name="theme-color" content="#12384f"><meta property="og:site_name" content="${esc(b.name)}"><meta property="og:locale" content="en_US"><meta property="og:title" content="${pageTitle}"><meta property="og:description" content="${descriptionTag}"><meta property="og:type" content="website"><meta property="og:url" content="${b.domain}${path}"><meta property="og:image" content="${ogImage.url}"><meta property="og:image:alt" content="${esc(ogImage.alt)}"><meta property="og:image:width" content="${ogImage.width}"><meta property="og:image:height" content="${ogImage.height}"><meta property="og:image:type" content="${ogImage.type}"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${pageTitle}"><meta name="twitter:description" content="${descriptionTag}"><meta name="twitter:image" content="${ogImage.url}"><meta name="twitter:image:alt" content="${esc(ogImage.alt)}"><link rel="icon" href="/assets/favicon.svg"><link rel="stylesheet" href="/assets/site.css"><script defer src="/assets/site.js"></script>${jsonLdScripts(path)}${scripts}</head><body><a class="skip" href="#main">Skip to content</a>${preview ? '<div class="preview-banner">Design preview · Business details and integrations pending client review</div>' : ""}<header class="wrap header"><a class="brand" href="/" aria-label="High Country Jetting home"><img class="brand-logo" src="/assets/logo.png" alt="High Country Jetting" width="1618" height="961"></a><button class="menu" aria-expanded="false" aria-controls="nav" type="button">Menu ＋</button><nav id="nav" aria-label="Main navigation">${nav}</nav><a class="header-call" href="tel:${b.tel}">Call now ↗</a></header><main id="main">${body}</main><footer><div class="wrap footer-grid"><div><a class="footer-brand" href="/">High Country Jetting</a><p>Drain & sewer services.<br>Rooted in the Uintah Basin.</p></div><div><p class="eyebrow">Explore</p>${links
     .slice(1)
     .map(([url, label]) => `<a href="${url}">${label}</a>`)
     .join(
       "",
-    )}</div><div><p class="eyebrow">Get in touch</p><a href="tel:${b.tel}">${b.phone}</a><a href="mailto:${b.email}">${b.email}</a><p>Uintah & Duchesne counties, Utah</p></div></div><div class="wrap footer-bottom"><span>© ${new Date().getFullYear()} High Country Jetting</span><span>Local roots. Clearer lines.</span></div></footer><a class="mobile-call" href="tel:${b.tel}">Call ${b.phone} ↗</a></body></html>`;
+    )}</div><div><p class="eyebrow">Get in touch</p><a href="tel:${b.tel}">${b.phone}</a><a href="mailto:${b.email}">${b.email}</a><p>Vernal, Roosevelt &amp; Duchesne<br>Uintah &amp; Duchesne counties, Utah</p></div></div><div class="wrap footer-bottom"><span>© ${new Date().getFullYear()} High Country Jetting</span><span>Local roots. Clearer lines.</span></div></footer><a class="mobile-call" href="tel:${b.tel}">Call ${b.phone} ↗</a></body></html>`;
   const file = path.endsWith(".html")
     ? "dist" + path
     : "dist" + path + "index.html";
