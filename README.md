@@ -63,6 +63,6 @@ The client posts job photos from his phone at `/admin/`. He signs in with Google
 - Who can post: the email lists in `firestore.rules` and `storage.rules`. Keep both lists in sync.
 - Rules deploy separately from hosting: `firebase deploy --only firestore:rules,storage`
 - Firebase config comes from Hosting's `/__/firebase/init.json`, so the live gallery and admin only work on Firebase Hosting, not on `npm run dev`.
-- AI captions use Firebase AI Logic (Gemini Developer API), model set in `src/assets/admin.js`.
+- AI captions use Firebase AI Logic with the Agent Platform Gemini API (formerly Vertex AI), model `gemini-3.8-flash` at location `global`, set in `src/assets/admin.js`. Usage bills on the project's Blaze plan. AI Studio prepayment is not used.
 
-One-time console setup: Blaze plan with a budget alert, Authentication → Sign-in method → Google, Authentication → Settings → Authorized domains (include the preview host above), Firestore database, Storage bucket, AI Logic, and App Check (recommended so the AI endpoint isn't open to abuse).
+One-time console setup: Blaze plan with a budget alert, Authentication → Sign-in method → Google, Authentication → Settings → Authorized domains (include the preview host above), Firestore database, Storage bucket, AI Logic with the Agent Platform Gemini API (`aiplatform.googleapis.com` plus the existing Firebase AI Logic API), and App Check. reCAPTCHA Enterprise is already initialized in `src/assets/fb.js`; keep App Check enforced for AI Logic.
