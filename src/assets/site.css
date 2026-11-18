@@ -1009,7 +1009,7 @@ body:has(.admin) .mobile-call { display: none }
 .admin-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-bottom: 28px }
 .admin-bar p { margin: 0; flex: 1 1 240px }
 [data-tone="error"] { color: var(--accent-dark); font-weight: 600 }
-#admin-status[data-tone="error"], #form-msg[data-tone="error"] { display: block; background: #fff; border: 2px solid var(--accent); border-radius: 12px; padding: 12px 14px }
+#admin-status[data-tone="error"], #form-msg[data-tone="error"] { display: block; background: #fff; border: 2px solid var(--accent); border-radius: 12px; padding: 12px 14px; overflow-wrap: anywhere }
 [data-tone="ok"] { color: var(--ink); font-weight: 600 }
 .admin-link, .photo-list .remove { background: none; border: 0; padding: 4px 0; font: inherit; color: var(--accent-dark); text-decoration: underline; cursor: pointer }
 .admin-card { background: var(--tint-warm); border-radius: 16px; padding: 24px; margin-bottom: 28px; display: grid; gap: 16px }
