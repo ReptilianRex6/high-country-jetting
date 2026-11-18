@@ -40,6 +40,13 @@ function friendly(err) {
   return code ? `Something went wrong (${code}). Please try again.` : "Something went wrong. Please try again.";
 }
 
+function captionError(err) {
+  const code = err?.code ? String(err.code) : "";
+  const message = err?.message ? String(err.message) : "";
+  if (code && message) return `${code}: ${message}`;
+  return message || code || "No error details were returned.";
+}
+
 let app, auth, db, storage, fs, st;
 try {
   app = await getApp();
@@ -159,7 +166,7 @@ ui.suggest.onclick = async () => {
     say(ui.msg, "Here's a draft. Edit anything you like, then post.", "ok");
   } catch (err) {
     console.error(err);
-    say(ui.msg, "Couldn't write one right now. You can type your own.", "error");
+    say(ui.msg, `Couldn't write a caption. ${captionError(err)} You can type your own.`, "error");
   } finally {
     ui.suggest.disabled = false;
   }
