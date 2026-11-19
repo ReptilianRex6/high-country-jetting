@@ -72,7 +72,7 @@ export const towns = [
     page: true,
     lead: "Hydro-jetting, drain cleaning, and sewer camera inspections for homes and businesses in Vernal, Utah.",
     blurb:
-      "Naples and Ballard are nearby Uintah County communities in the same service area. Call with the town and what the line is doing: a slow drain, a backup, or a look with a camera before any repair.",
+      "Slow drain, backup, or need a camera look before a repair? Call with what the line is doing and we’ll talk through the next step.",
   },
   { slug: "naples", name: "Naples", county: "Uintah" },
   { slug: "ballard", name: "Ballard", county: "Uintah" },
@@ -85,7 +85,7 @@ export const towns = [
     page: true,
     lead: "Hydro-jetting, drain cleaning, and sewer camera inspections for homes and businesses in Roosevelt, Utah.",
     blurb:
-      "Roosevelt is in Duchesne County. Myton lies west of town, and Ballard and Fort Duchesne are nearby communities in the service area. Tell us the town and what’s going on, and we’ll talk through the next step.",
+      "Slow drain, backup, or need a camera look before a repair? Call with what the line is doing and we’ll talk through the next step.",
   },
   {
     slug: "duchesne",
@@ -94,7 +94,7 @@ export const towns = [
     page: true,
     lead: "Hydro-jetting, drain cleaning, and sewer camera inspections for homes and businesses in Duchesne, Utah.",
     blurb:
-      "Duchesne is in Duchesne County, west of Roosevelt and Myton. Altamont and Tabiona are smaller communities in the same county and the same service area. Call with the town and a short description of the problem.",
+      "Slow drain, backup, or need a camera look before a repair? Call with what the line is doing and we’ll talk through the next step.",
   },
   { slug: "myton", name: "Myton", county: "Duchesne" },
   { slug: "altamont", name: "Altamont", county: "Duchesne" },
@@ -104,12 +104,12 @@ export const towns = [
 
 export const faqs = [
   {
-    q: "Do you serve Vernal?",
-    a: `Yes. Vernal is in Uintah County, in the Uintah Basin area we cover. Call or text ${business.phone} with the town and what’s happening with the line.`,
+    q: "Where do you work?",
+    a: "Across the Uintah Basin, from Fruitland to Jensen, including Vernal, Roosevelt, and Duchesne.",
   },
   {
-    q: "Do you serve Roosevelt and Duchesne?",
-    a: "Yes. Roosevelt and Duchesne are in Duchesne County. The service area runs from Fruitland to Jensen and also includes Ballard, Naples, Myton, Fort Duchesne, Altamont, and Tabiona. If the job is outside Uintah and Duchesne counties, call and we’ll discuss availability.",
+    q: "What if I’m outside the service area?",
+    a: `Call anyway at ${business.phone}. We can often make arrangements for jobs outside the Basin.`,
   },
   {
     q: "What’s the difference between hydro-jetting and snaking?",

@@ -412,10 +412,11 @@ em {
     color: var(--muted)
 }
 
-.hero h1 .places {
+h1 .places {
     display: block;
     max-width: 18em;
-    margin-bottom: 14px;
+    margin-top: 22px;
+    color: var(--muted);
     font-size: clamp(1.2rem, 2vw, 1.65rem);
     line-height: 1.25;
     letter-spacing: -.02em;
