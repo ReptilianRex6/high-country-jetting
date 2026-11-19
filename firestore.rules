@@ -1,0 +1,38 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Accounts allowed to post/remove gallery photos. Keep in sync with storage.rules.
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in [
+          'highcountryjetting@gmail.com'
+          , 'ethanbennett136@gmail.com'
+        ];
+    }
+
+    function validPhoto(d) {
+      return d.keys().hasOnly(['caption', 'description', 'alt', 'category', 'url1280', 'url640',
+                               'paths', 'width', 'height', 'smallWidth', 'createdAt'])
+        && d.caption is string && d.caption.size() > 0 && d.caption.size() <= 80
+        && d.description is string && d.description.size() <= 500
+        && d.alt is string && d.alt.size() <= 200
+        && d.category in ['drain-sewer', 'property']
+        && d.url1280 is string && d.url640 is string
+        && d.paths is list && d.paths.size() == 2
+        && d.width is int && d.height is int && d.smallWidth is int
+        && d.createdAt == request.time;
+    }
+
+    match /photos/{id} {
+      allow read: if true;
+      allow create: if isAdmin() && validPhoto(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    // The admin page reads this (nonexistent) doc to check access.
+    match /admin/{doc} {
+      allow read: if isAdmin();
+    }
+  }
+}

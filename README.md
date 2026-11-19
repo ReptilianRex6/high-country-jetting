@@ -1,5 +1,13 @@
 # High Country Jetting
 
+## Branch workflow
+
+- Work on `staging`. Pushes run `.github/workflows/firebase-staging.yml` and update Firebase's `client-review` channel, renewing it for 30 days after each successful deployment.
+- GitHub uses Workload Identity Federation and a short-lived access token (no stored service-account key), restricted to this repository's staging branch. The cloud IAM setup is configured.
+- Merge approved staging changes into `main` at launch. The main workflow currently checks the production build only; live deployment is deliberately disabled. Enable a separately authorized main-branch identity/deploy step at launch. Merging today will not publish to Firebase live.
+- The older GitHub Pages preview remains available; Firebase is the review target going forward.
+- Drain/sewer and property services share `/services/`, with separate sections. `/other-services/` forwards to the property section.
+
 ## Firebase review hosting
 
 Project: `high-country-jetting` (selected in `.firebaserc`). Review channel: `client-review`.
@@ -13,7 +21,7 @@ Refresh the review deployment after building and checking in preview mode, with 
 firebase hosting:channel:deploy client-review --project high-country-jetting --expires 30d
 ```
 
-Firebase Auth is not used by this static site; a preview-channel Auth synchronization warning does not require enabling sign-in.
+`/admin/` signs in with Firebase Auth. Channel deploys warn `Unable to add channel domain to Firebase Auth` because the staging deploy account cannot edit Auth settings. Sign-in on the preview fails until that host is listed under Authentication → Settings → Authorized domains. For this channel, add `high-country-jetting--client-review-a2lzch5c.web.app`. Also enable Google under Authentication → Sign-in method.
 
 Static multi-page redesign.
 
@@ -47,3 +55,14 @@ Production permits indexing and removes preview notices. Do not launch until con
 ## Photo workflow to set up
 
 Use a client-owned Website Photos Drive folder and test uploads from the client's phone. Include service, town, caption, and publication permission. Review submissions, remove sensitive details/location metadata, optimize into `src/assets/work/`, and add approved entries to `work` in `src/content.mjs` with `slug`, `alt`, `caption`, `width`, and `height`; produce matching `<slug>-640.webp` and `<slug>-1280.webp` variants. Build, check, and deploy after review. Drive submissions do not automatically publish. Confirm future publishing responsibility and maintenance pricing at handoff.
+
+## Photo manager (`/admin/`)
+
+The client posts job photos from his phone at `/admin/`. He signs in with Google, picks a photo and a category, adds a caption, and optionally taps **✨ Write it for me**. The photo is resized in the browser to 1280px and 640px WebP (JPEG on older Safari). Re-encoding drops EXIF/GPS data. The files go to Cloud Storage `work/`, the entry goes to Firestore `photos`, and `/recent-work/` loads those entries in front of the built-in photos.
+
+- Who can post: the email lists in `firestore.rules` and `storage.rules`. Keep both lists in sync.
+- Rules deploy separately from hosting: `firebase deploy --only firestore:rules,storage`
+- Firebase config comes from Hosting's `/__/firebase/init.json`, so the live gallery and admin only work on Firebase Hosting, not on `npm run dev`.
+- AI captions use Firebase AI Logic with the Agent Platform Gemini API (formerly Vertex AI), model `gemini-3.8-flash` at location `global`, set in `src/assets/admin.js`. Usage bills on the project's Blaze plan. AI Studio prepayment is not used.
+
+One-time console setup: Blaze plan with a budget alert, Authentication → Sign-in method → Google, Authentication → Settings → Authorized domains (include the preview host above), Firestore database, Storage bucket, AI Logic with the Agent Platform Gemini API (`aiplatform.googleapis.com` plus the existing Firebase AI Logic API), and App Check. reCAPTCHA Enterprise is already initialized in `src/assets/fb.js`; keep App Check enforced for AI Logic.
