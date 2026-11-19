@@ -61,10 +61,9 @@ export const work = [
   { slug: 'jetting-trailer', alt: 'High Country Jetting equipment trailer parked inside a workshop', caption: 'Equipment ready for the next job', width: 1125, height: 2000 },
 ];
 
-// Communities inside the two counties the site already says it serves.
-// Assumption: naming them follows from that county-wide area. Confirm and
-// delete any town the business does not actually cover. Only Vernal,
-// Roosevelt, and Duchesne get their own pages.
+// Confirmed communities in Uintah and Duchesne counties.
+// The service area runs from Fruitland to Jensen.
+// Only Vernal, Roosevelt, and Duchesne get their own pages.
 export const towns = [
   {
     slug: "vernal",
@@ -78,6 +77,7 @@ export const towns = [
   { slug: "naples", name: "Naples", county: "Uintah" },
   { slug: "ballard", name: "Ballard", county: "Uintah" },
   { slug: "fort-duchesne", name: "Fort Duchesne", county: "Uintah" },
+  { slug: "jensen", name: "Jensen", county: "Uintah" },
   {
     slug: "roosevelt",
     name: "Roosevelt",
@@ -99,6 +99,7 @@ export const towns = [
   { slug: "myton", name: "Myton", county: "Duchesne" },
   { slug: "altamont", name: "Altamont", county: "Duchesne" },
   { slug: "tabiona", name: "Tabiona", county: "Duchesne" },
+  { slug: "fruitland", name: "Fruitland", county: "Duchesne" },
 ];
 
 export const faqs = [
@@ -108,7 +109,7 @@ export const faqs = [
   },
   {
     q: "Do you serve Roosevelt and Duchesne?",
-    a: "Yes. Roosevelt and Duchesne are in Duchesne County. The same area includes Ballard, Naples, Myton, Fort Duchesne, Altamont, and Tabiona. If the job is outside Uintah and Duchesne counties, call and we’ll discuss availability.",
+    a: "Yes. Roosevelt and Duchesne are in Duchesne County. The service area runs from Fruitland to Jensen and also includes Ballard, Naples, Myton, Fort Duchesne, Altamont, and Tabiona. If the job is outside Uintah and Duchesne counties, call and we’ll discuss availability.",
   },
   {
     q: "What’s the difference between hydro-jetting and snaking?",
@@ -120,11 +121,21 @@ export const faqs = [
   },
 ];
 
-// TODO(owner): add a URL only after that profile exists. Leave empty until then.
-// - Google Business Profile
-// - Facebook
-// - Instagram (the recent-work page still notes the feed is pending)
-export const profiles = [];
+// Public profiles. The build copies these URLs into JSON-LD sameAs.
+export const profiles = [
+  {
+    label: "Google Business Profile",
+    url: "https://maps.app.goo.gl/GthDx15HMS8DQn7VA",
+  },
+  {
+    label: "Facebook",
+    url: "https://www.facebook.com/people/High-Country-Jetting/61577259598908/",
+  },
+  {
+    label: "Instagram",
+    url: "https://www.instagram.com/highcountryjetting/",
+  },
+];
 
 // TODO(owner): postal address to publish, or leave null.
 // Shape: { "@type": "PostalAddress", streetAddress, addressLocality, addressRegion, postalCode, addressCountry }
