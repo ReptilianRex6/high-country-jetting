@@ -70,7 +70,13 @@ async function scan(dir) {
           const cities = data.areaServed
             .filter((area) => area["@type"] === "City")
             .map((area) => area.name);
-          for (const town of ["Vernal", "Roosevelt", "Duchesne"])
+          for (const town of [
+            "Vernal",
+            "Roosevelt",
+            "Duchesne",
+            "Fruitland",
+            "Jensen",
+          ])
             if (!cities.includes(town))
               throw Error(`${path}: areaServed missing ${town}`);
           if (

@@ -589,13 +589,8 @@ em {
     color: var(--muted)
 }
 
-.note {
-    border-left: 3px solid var(--accent);
-    padding: 18px 22px;
-    background: var(--tint-warm);
-    margin-top: 35px;
-    font-size: .9rem;
-    line-height: 1.7
+.follow {
+    margin: 32px 0 0
 }
 
 .gallery {
@@ -636,9 +631,22 @@ em {
 
 .email {
     display: block;
-    margin-block: 28px 45px;
+    margin-block: 28px 16px;
     overflow-wrap: anywhere;
     text-underline-offset: 5px
+}
+
+.profile-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    margin: 0 0 36px
+}
+
+.profile-links a {
+    font-size: .88rem;
+    font-weight: 700;
+    text-underline-offset: 6px
 }
 
 .small-title {
@@ -690,12 +698,17 @@ footer {
     letter-spacing: -.04em
 }
 
-.footer-grid>div>a:not(.footer-brand) {
+.footer-grid>div>a:not(.footer-brand),
+.footer-profiles a {
     display: block;
     text-decoration: none;
     font-size: .87rem;
     margin-bottom: 15px;
     overflow-wrap: anywhere
+}
+
+.footer-profiles a:last-child {
+    margin-bottom: 0
 }
 
 .footer-grid p {

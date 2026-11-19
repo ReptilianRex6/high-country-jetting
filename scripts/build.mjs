@@ -64,6 +64,18 @@ function townListHtml() {
     })
     .join("")}</ul>`;
 }
+function profileLinksHtml(className) {
+  const links = profiles
+    .map((profile) => {
+      const name = `${b.name} on ${profile.label}`;
+      return `<a href="${esc(profile.url)}" aria-label="${esc(name)}">${esc(profile.label)}</a>`;
+    })
+    .join("");
+  // One landmark for the repeated footer links. In-page links keep their own names.
+  return className === "footer-profiles"
+    ? `<nav class="footer-profiles" aria-label="Find us online">${links}</nav>`
+    : `<div class="${className}">${links}</div>`;
+}
 function faqHtml() {
   return `<section class="wrap section faq" id="faq" aria-labelledby="faq-title"><div class="section-heading"><div><p class="eyebrow">Good questions</p><h2 id="faq-title">Before you call.</h2></div><p>Where we work, and how hydro-jetting compares with snaking.</p></div><div class="faq-list">${faqs
     .map(
@@ -87,7 +99,7 @@ function businessSchema() {
       `${b.domain}/assets/logo.png`,
     ],
     description:
-      "Drain cleaning, hydro-jetting, camera inspections, pipe descaling, and line locating for Uintah and Duchesne counties in Utah’s Uintah Basin.",
+      "Drain cleaning, hydro-jetting, camera inspections, pipe descaling, and line locating for Uintah and Duchesne counties, from Fruitland to Jensen, in Utah’s Uintah Basin.",
     areaServed: [
       ...towns.map((t) => ({
         "@type": "City",
@@ -129,14 +141,23 @@ function businessSchema() {
       ],
     },
   };
-  // sameAs, address, openingHours, and geo stay off until src/content.mjs has real values.
+  // address, openingHours, and geo stay off until src/content.mjs has real values.
   if (profiles.length) {
     if (
-      profiles.some((url) => typeof url !== "string" || !/^https:\/\//.test(url))
+      profiles.some(
+        (profile) =>
+          !profile ||
+          typeof profile.label !== "string" ||
+          !profile.label.trim() ||
+          typeof profile.url !== "string" ||
+          !/^https:\/\//.test(profile.url),
+      )
     ) {
-      throw new Error("profiles in src/content.mjs must be https URLs");
+      throw new Error(
+        "profiles in src/content.mjs need a label and an https URL",
+      );
     }
-    schema.sameAs = profiles;
+    schema.sameAs = profiles.map((profile) => profile.url);
   }
   if (address) schema.address = address;
   if (openingHours) schema.openingHours = openingHours;
@@ -189,13 +210,13 @@ function serviceAreaPage() {
   return [
     "/service-area/",
     "Service Area: Vernal, Roosevelt & Duchesne, Utah",
-    "High Country Jetting serves Vernal, Roosevelt, Duchesne, and other communities in Uintah and Duchesne counties, Utah.",
+    "High Country Jetting serves Vernal, Roosevelt, Duchesne, and other communities from Fruitland to Jensen in Uintah and Duchesne counties, Utah.",
     intro(
       "Service area",
       "Vernal, Roosevelt,<br>Duchesne & the<br><em>Uintah Basin.</em>",
-      "Drain cleaning, hydro-jetting, and sewer inspections across Uintah County and Duchesne County, Utah.",
+      "Drain cleaning, hydro-jetting, and sewer inspections from Fruitland to Jensen, across Uintah County and Duchesne County, Utah.",
     ) +
-      `<section class="wrap section"><div class="section-heading"><div><p class="eyebrow">Where we work</p><h2>Two counties.<br>These communities.</h2></div><p>These towns are in the Uintah Basin counties we serve. Don’t see yours? Call with the location and we’ll discuss availability.</p></div>${townListHtml()}<p class="town-also"><a class="text-link" href="/contact/">Ask about a town ↗</a></p></section>${faqHtml()}${band}`,
+      `<section class="wrap section"><div class="section-heading"><div><p class="eyebrow">Where we work</p><h2>Two counties.<br>These communities.</h2></div><p>These towns run from Fruitland to Jensen. Don’t see yours? Call with the location and we’ll discuss availability.</p></div>${townListHtml()}<p class="town-also"><a class="text-link" href="/contact/">Ask about a town ↗</a></p></section>${faqHtml()}${band}`,
   ];
 }
 
@@ -207,8 +228,17 @@ const home = `<section class="wrap hero"><div><p class="eyebrow">● &nbsp; Serv
   )
   .join(
     "",
-  )}</div></section><section class="area" id="service-area"><div class="wrap area-grid"><p class="eyebrow">Right here in the Basin</p><h2>Vernal,<br>Roosevelt<br>&amp; Duchesne.</h2><div><p class="lead">Homes and businesses in both counties.</p>${townListHtml()}<p>Have a job outside the regular service area? Call with your location and we’ll discuss availability.</p><a class="text-link" href="/service-area/">See towns we serve ↗</a></div></div></section>${band}`;
+  )}</div></section><section class="area" id="service-area"><div class="wrap area-grid"><p class="eyebrow">Right here in the Basin</p><h2>Vernal,<br>Roosevelt<br>&amp; Duchesne.</h2><div><p class="lead">Homes and businesses from Fruitland to Jensen.</p>${townListHtml()}<p>Have a job outside the regular service area? Call with your location and we’ll discuss availability.</p><a class="text-link" href="/service-area/">See towns we serve ↗</a></div></div></section>${band}`;
 const gallery = `<div class="gallery" id="gallery">${work.map((w) => `<figure><a href="/assets/work/${w.slug}-1280.webp" aria-label="View larger photo: ${esc(w.caption)}">${photo(w)}</a><figcaption>${esc(w.caption)}</figcaption></figure>`).join("")}</div>`;
+const instagram = profiles.find(
+  (profile) =>
+    profile &&
+    typeof profile.url === "string" &&
+    profile.url.includes("instagram.com/"),
+);
+const instagramFollow = instagram
+  ? `<p class="follow"><a class="text-link" href="${esc(instagram.url)}">Follow us on Instagram ↗</a></p>`
+  : "";
 
 const pages = [
   [
@@ -240,7 +270,7 @@ const pages = [
       "Recent work<br>around Vernal,<br><em>Roosevelt &amp; Duchesne.</em>",
       "Drain and sewer service, property maintenance, and projects across Uintah and Duchesne counties in Utah.",
     ) +
-      `<section class="wrap section">${gallery}${preview ? '<aside class="note"><strong>Preview content pending:</strong> The recent Instagram posts feed will be added when the account is available.</aside>' : ""}</section>` +
+      `<section class="wrap section">${gallery}${instagramFollow}</section>` +
       band,
     '<script type="module" src="/assets/gallery.js"></script>',
   ],
@@ -253,7 +283,7 @@ const pages = [
       "Let’s talk.<br>Vernal, Roosevelt<br><em>&amp; Duchesne.</em>",
       "Call, text, or email with your town and a brief description of the problem.",
     ) +
-      `<section class="wrap contact-grid"><div><p class="eyebrow">Start a conversation</p><a class="big-phone" href="tel:${b.tel}">${b.phone}</a><a class="text-link" href="sms:${b.tel}">Send a text ↗</a><a class="email" href="mailto:${b.email}">${b.email}</a><h2 class="small-title">Service area</h2><p>Vernal, Roosevelt, and Duchesne, plus Naples, Ballard, Fort Duchesne, Myton, Altamont, and Tabiona.</p><p>Those communities are in Uintah County or Duchesne County, Utah. <a href="/service-area/">See the service area ↗</a></p><p>Outside these counties? Contact us to ask about availability.</p></div><aside class="inquiry"><p class="eyebrow">Help us help you</p><h2>A few details<br>go a long way.</h2><ol><li>Your name and callback number</li><li>The town or location of the job</li><li>What’s happening, and when it started</li><li>A convenient time to get in touch</li></ol><p>Please call for urgent issues. Email response times can vary.</p></aside></section>`,
+      `<section class="wrap contact-grid"><div><p class="eyebrow">Start a conversation</p><a class="big-phone" href="tel:${b.tel}">${b.phone}</a><a class="text-link" href="sms:${b.tel}">Send a text ↗</a><a class="email" href="mailto:${b.email}">${b.email}</a>${profileLinksHtml("profile-links")}<h2 class="small-title">Service area</h2><p>Vernal, Roosevelt, and Duchesne, plus Naples, Ballard, Fort Duchesne, Myton, Altamont, Tabiona, Fruitland, and Jensen.</p><p>Those communities are in Uintah County or Duchesne County, Utah, from Fruitland to Jensen. <a href="/service-area/">See the service area ↗</a></p><p>Outside these counties? Contact us to ask about availability.</p></div><aside class="inquiry"><p class="eyebrow">Help us help you</p><h2>A few details<br>go a long way.</h2><ol><li>Your name and callback number</li><li>The town or location of the job</li><li>What’s happening, and when it started</li><li>A convenient time to get in touch</li></ol><p>Please call for urgent issues. Email response times can vary.</p></aside></section>`,
   ],
   [
     "/admin/",
@@ -303,7 +333,7 @@ for (const [path, title, description, body, scripts = ""] of pages) {
     .map(([url, label]) => `<a href="${url}">${label}</a>`)
     .join(
       "",
-    )}</div><div><p class="eyebrow">Get in touch</p><a href="tel:${b.tel}">${b.phone}</a><a href="mailto:${b.email}">${b.email}</a><p>Vernal, Roosevelt &amp; Duchesne<br>Uintah &amp; Duchesne counties, Utah</p></div></div><div class="wrap footer-bottom"><span>© ${new Date().getFullYear()} High Country Jetting</span><span>Local roots. Clearer lines.</span></div></footer><a class="mobile-call" href="tel:${b.tel}">Call ${b.phone} ↗</a></body></html>`;
+    )}</div><div><p class="eyebrow">Get in touch</p><a href="tel:${b.tel}">${b.phone}</a><a href="mailto:${b.email}">${b.email}</a>${profileLinksHtml("footer-profiles")}<p>Vernal, Roosevelt &amp; Duchesne<br>Uintah &amp; Duchesne counties, Utah</p></div></div><div class="wrap footer-bottom"><span>© ${new Date().getFullYear()} High Country Jetting</span><span>Local roots. Clearer lines.</span></div></footer><a class="mobile-call" href="tel:${b.tel}">Call ${b.phone} ↗</a></body></html>`;
   const file = path.endsWith(".html")
     ? "dist" + path
     : "dist" + path + "index.html";
