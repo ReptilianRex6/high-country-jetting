@@ -204,7 +204,7 @@ function townPage(town) {
       `Drain cleaning<br>in <em>${esc(town.name)}.</em>`,
       town.lead,
     ) +
-      `<section class="wrap section town-services"><div class="section-heading"><div><p class="eyebrow">Services</p><h2>How we can help.</h2></div><p>${esc(town.blurb)}</p></div><ul class="service-links">${serviceItems}</ul><p class="town-also">Also serving ${joinList(others.map(townName))}, and the rest of the <a href="/service-area/">Uintah Basin</a>. ${outsideArea}</p></section>${band}`,
+      `<section class="wrap section town-services"><div class="section-heading"><div><p class="eyebrow">Services</p><h2>How we can help.</h2></div><p>${esc(town.blurb)}</p></div><ul class="service-links">${serviceItems}</ul><p class="town-also">Also serving ${joinList(others.map(townName))}, and the rest of the <a href="/service-area/">Uintah Basin</a>.</p></section>${band}`,
   ];
 }
 function serviceAreaPage() {
@@ -218,7 +218,7 @@ function serviceAreaPage() {
       "Drain cleaning, hydro-jetting, and sewer inspections from Fruitland to Jensen, across Uintah and Duchesne counties.",
       "Vernal · Roosevelt · Duchesne",
     ) +
-      `<section class="wrap section"><div class="section-heading"><div><p class="eyebrow">Where we work</p><h2>Towns we serve.</h2></div><p>From Fruitland to Jensen, across Uintah and Duchesne counties. Don’t see your town? Call anyway. We can often make arrangements.</p></div>${townListHtml()}<p class="town-also"><a class="text-link" href="/contact/">Contact us ↗</a></p></section>${faqHtml()}${band}`,
+      `<section class="wrap section"><div class="section-heading"><div><p class="eyebrow">Where we work</p><h2>Towns we serve.</h2></div><p>Vernal, Roosevelt, and Duchesne have their own pages. The other towns we cover are on the list too.</p></div>${townListHtml()}<p class="town-also"><a class="text-link" href="/contact/">Contact us ↗</a></p></section>${faqHtml()}${band}`,
   ];
 }
 
@@ -256,7 +256,7 @@ const pages = [
     intro(
       "Our services",
       "One local crew.<br><em>Clear lines.</em>",
-      "Drain cleaning, hydro-jetting, camera inspections, and property care for homes and businesses in Utah’s Uintah Basin.",
+      "Clogged drains, stubborn buildup, and lines you want to see before anyone digs. Here’s the drain, sewer, and property work we do.",
     ) +
       `<section class="wrap service-list" aria-labelledby="drain-sewer"><div class="category-heading service-heading"><h2 id="drain-sewer">Drain &amp; sewer</h2><a class="text-link" href="#property-services">Jump to property services ↓</a></div>${services.map((s) => `<article class="service-row" id="${s[0]}"><div><h3>${s[1]}</h3><p>${s[2]}</p></div><div><p>${s[3]}</p></div></article>`).join("")}<div class="section-contact"><a class="text-link" href="/contact/">Ask about drain &amp; sewer services ↗</a></div></section><section class="property-services" aria-labelledby="property-services"><div class="wrap category-heading"><h2 id="property-services">Around your property</h2><p class="property-tagline">Care beyond the sewer line.</p></div><div class="wrap other-grid">${other.map((s) => `<article><h3>${s[0]}</h3><p>${s[1]}</p></article>`).join("")}</div><div class="wrap section-contact"><a class="text-link" href="/contact/">Ask about property services ↗</a></div></section>` +
       band,
@@ -269,8 +269,8 @@ const pages = [
     "Photos of drain, sewer, and property work by High Country Jetting in Vernal, Roosevelt, Duchesne, and nearby Uintah Basin towns.",
     intro(
       "Recent work",
-      "Recent work<br><em>around the Basin.</em>",
-      "Drain and sewer service, property maintenance, and projects across Uintah and Duchesne counties in Utah.",
+      "Photos from<br><em>real jobs.</em>",
+      "Drain cleaning, hydro-jetting, inspections, and property work. These are the trucks, the tools, and the kind of jobs we take on.",
     ) +
       `<section class="wrap section">${gallery}${instagramFollow}</section>` +
       band,
@@ -285,7 +285,7 @@ const pages = [
       "Let’s <em>talk.</em>",
       "Call, text, or email with your town and a brief description of the problem.",
     ) +
-      `<section class="wrap contact-grid"><div><p class="eyebrow">Start a conversation</p><a class="big-phone" href="tel:${b.tel}">${b.phone}</a><a class="text-link" href="sms:${b.tel}">Send a text ↗</a><a class="email" href="mailto:${b.email}">${b.email}</a>${profileLinksHtml("profile-links")}<h2 class="small-title">Service area</h2><p>Vernal, Roosevelt, Duchesne, and the Uintah Basin from Fruitland to Jensen. <a href="/service-area/">See the service area ↗</a></p><p>${outsideArea}</p></div><aside class="inquiry"><p class="eyebrow">Help us help you</p><h2>A few details<br>go a long way.</h2><ol><li>Your name and callback number</li><li>The town or location of the job</li><li>What’s happening, and when it started</li><li>A convenient time to get in touch</li></ol><p>Please call for urgent issues. Email response times can vary.</p></aside></section>`,
+      `<section class="wrap contact-grid"><div><p class="eyebrow">Start a conversation</p><a class="big-phone" href="tel:${b.tel}">${b.phone}</a><a class="text-link" href="sms:${b.tel}">Send a text ↗</a><a class="email" href="mailto:${b.email}">${b.email}</a>${profileLinksHtml("profile-links")}<h2 class="small-title">Service area</h2><p>Tell us your town when you call. <a href="/service-area/">See the towns we cover ↗</a>. If yours isn’t listed, call and we’ll see what we can do.</p></div><aside class="inquiry"><p class="eyebrow">Help us help you</p><h2>A few details<br>go a long way.</h2><ol><li>Your name and callback number</li><li>The town or location of the job</li><li>What’s happening, and when it started</li><li>A convenient time to get in touch</li></ol><p>Please call for urgent issues. Email response times can vary.</p></aside></section>`,
   ],
   [
     "/admin/",
